@@ -1,0 +1,20 @@
+НА ВМ
+sudo nano /etc/mysql/mysql.conf.d/mysqld.cnf
+если maria db то
+sudo nano /etc/mysql/mariadb.conf.d/50-server.cnf
+найти строку bind-address = 127.0.0.1
+заменить на bind-address = 0.0.0.0 (разрешит подключения извне) 
+sudo systemctl restart mysql (или mariadb)
+
+разрешить пользователя для удаленного подключения
+mysql -u root -p
+Создать пользователя (или изменить существующего) чтоб был % (можно подкл с любого IP)
+
+Открыть в ufw 3306 порт
+
+НА СЕРВЕРЕ 
+В phpmyadmin указываем
+Server: IPВМ
+User: имя юзера которого мы указали в бд
+Password: пароль который присвоен юзеру при создании
+Port: 3306

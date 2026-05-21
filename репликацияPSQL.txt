@@ -1,0 +1,48 @@
+1. MASTER настройка
+
+postgresql.conf
+listen_addresses = '*'
+wal_level = replica
+max_wal_senders = 10
+wal_keep_size = 1GB
+
+pg_hba.conf
+host replication replicator IPСлейва/32 scram-sha-256
+
+Создать пользователя
+CREATE ROLE replicator WITH REPLICATION LOGIN PASSWORD '123456';
+
+systemctl restart postgresql
+
+Проверка мастера
+ss -tulnp | grep 5432
+
+
+
+2. SLAVE настройка
+
+systemctl stop postgresql
+
+Очистить data dir
+rm -rf /var/lib/postgresql/17/main/*
+
+Бэкап с MASTER
+pg_basebackup -h IPМастера \
+  -D /var/lib/postgresql/17/main \
+  -U replicator \
+  -P -R
+
+Вводим пароль 
+
+Права
+chown -R postgres:postgres /var/lib/postgresql
+
+Запуск SLAVE
+systemctl start postgresql
+
+Проверка
+SLAVE
+ss -tulnp | grep 5432
+
+MASTER
+SELECT * FROM pg_stat_replication;

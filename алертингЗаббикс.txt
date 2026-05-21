@@ -1,0 +1,15 @@
+1 Привязать почту
+Alerts --> Media types --> Gmail Enabled --> Настроить (вместо пароля 16значный код)
+
+2 Привязать почту к пользователю
+Users --> Users --> Create User --> Настроить User --> Там же настроить Media
+
+3 Указать на что будет посылаться алерт
+Alerts --> Actions --> Trigger Action --> Create Action --> Name и Conditions (Type: Trigger severity, Operator: equals, Severity: Not classified) --> Там же Operations (Step duration: 0, Sent to media type: Gmail)
+
+Severity:
+Not classified всё подряд (включая мусор)
+Warning будешь получать: Warning, Average, High, Disaster (рекомендую)
+Average только реальные проблемы
+High только жесткие проблемы
+Disaster когда все легло

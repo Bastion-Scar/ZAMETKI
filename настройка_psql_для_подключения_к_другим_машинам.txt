@@ -1,0 +1,18 @@
+создание базы
+CREATE DATABASE name;
+
+создание юзера и выдача привелегий
+CREATE USER zabbix WITH PASSWORD 'zabbix';
+GRANT CONNECT ON DATABASE postgres TO zabbix;
+GRANT ALL PRIVILEGES ON DATABASE zabbix TO zabbix;
+
+подключение клиентов
+sudo nano /etc/postgresql/<версия>/main/pg_hba.conf
+host all zabbix IPВМнакоторойпостгрес scram-sha-256
+
+nano /etc/postgresql/*/main/postgresql.conf
+Найди:
+listen_addresses = 'localhost'
+Поменяй на:
+listen_addresses = '*' (ИЛИ ВМЕСТО "*" IPВМ на которой постгрес)
+sudo systemctl restart postgresql

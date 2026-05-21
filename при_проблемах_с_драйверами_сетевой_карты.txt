@@ -1,0 +1,17 @@
+sudo systemctl disable networking
+sudo systemctl stop networking
+установить .deb пакет нужного драйвера и перенести в домашнюю папку
+sudo dpkg -i r8168-dkms_8.055.00-1_all.deb (пример, деб может быть другой)
+sudo modprobe r8168 (добавляет драйверы)
+sudo lsmod | grep r8168 (проверка что все работает)
+sudo nano /etc/network/interfaces
+ПРИМЕР nano
+
+auto enp2s0
+iface enp2s0 inet static
+address 10.202.49.203 (меняем на свой)
+netmask 255.255.255.0
+gateway 10.202.49.2 (меняем на свой)
+dns-nameservers 172.16.4.5 8.8.8.8 (1.1.1.1 или 8.8.8.8)
+
+sudo systemctl enable networking

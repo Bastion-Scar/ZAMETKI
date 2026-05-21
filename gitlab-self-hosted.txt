@@ -1,0 +1,37 @@
+устанавливаем docker
+docker network create gitlab-network
+
+
+sudo mkdir -p /srv/gitlab
+
+docker run --detach \
+  --hostname gitlab.local \
+  --env GITLAB_OMNIBUS_CONFIG="external_url 'http://10.202.49.110'" \
+  --publish 80:80 \
+  --publish 443:443 \
+  --publish 2222:22 \
+  --name gitlab \
+  --restart always \
+  --network gitlab-network \
+  --volume /srv/gitlab/config:/etc/gitlab \
+  --volume /srv/gitlab/logs:/var/log/gitlab \
+  --volume gitlab-data:/var/opt/gitlab \
+  --shm-size 256m \
+  gitlab/gitlab-ce:18.9.7-ce.0
+  
+  Подтвердить пользователя
+  docker exec -it gitlab gitlab-rails console
+  
+u = User.find_by(username: "admin240")
+u.state = "active"
+u.save!
+
+регистрация раннера 
+gitlab-runner register
+1. URL: http://10.202.49.110 (тот url который был указан при создании контейнера)
+2. executor
+docker
+3. default image
+alpine:latest
+
+gitlab-runner run

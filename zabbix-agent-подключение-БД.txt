@@ -1,0 +1,49 @@
+Ставим агента на нужную виртуалку.
+Создаем юзера в MySQL который будет все собирать
+На виртуалке nano /etc/zabbix/zabbix_agent2.d/mysql.conf (в зависимости от субд может быть другой кфг)
+
+Plugins.MySQL.Uri=tcp://10.202.49.107:3306
+Plugins.MySQL.User=zabbix
+Plugins.MySQL.Password=zabbix
+
+на сервере MySQL
+CREATE USER 'zabbix'@'%' IDENTIFIED BY 'zabbix';
+GRANT PROCESS, REPLICATION CLIENT, SELECT ON *.* TO 'zabbix'@'%';
+FLUSH PRIVILEGES;
+
+
+sudo systemctl restart zabbix-agent (или zabbix-agent2)
+
+Настроить макросы 
+{$MYSQL.HOST}
+{$MYSQL.PASSWORD}
+{$MYSQL.USER}
+
+ДЛЯ PSQL
+Ставим агента на нужную виртуалку
+Создаем юзера и выдаем привелегии
+CREATE USER zabbix WITH PASSWORD 'zabbix';
+GRANT CONNECT ON DATABASE postgres TO zabbix;
+GRANT ALL PRIVILEGES ON DATABASE zabbix TO zabbix;
+ALTER ROLE zabbix WITH LOGIN;
+GRANT pg_monitor TO zabbix;
+
+apt install zabbix-agent2-plugin-postgresql -y
+
+nano /etc/zabbix/zabbix_agent2.conf
+Server=IP_ТВОЕГО_ZABBIX
+ServerActive=IP_ТВОЕГО_ZABBIX
+Hostname=ИМЯ_ХОСТА
+
+sudo nano /etc/postgresql/17/main/pg_hba.conf
+host    all     zabbix    10.202.49.56/32       scram-sha-256
+
+
+systemctl restart zabbix-agent2
+systemctl enable zabbix-agent2
+
+на сервере zabbix выполнить:
+zabbix_get -s IP_АГЕНТА -k pgsql.ping
+ожидание: 1
+
+Настроить макросы
