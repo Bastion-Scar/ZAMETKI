@@ -1,0 +1,39 @@
+variables PASSWORD и USERNAME указываются в гитлабе во вкладке CI/CD --> Variables
+
+stages:
+  - build
+  - deploy
+
+variables:
+  IMAGE_NAME: dockerhub.rds03.utz.local/test/myapp
+
+build:
+  stage: build
+  image: docker:24
+  script:
+    - docker info
+    - echo "$PASSWORD" | docker login dockerhub.rds03.utz.local -u "$USERNAME" --password-stdin
+    - COMMIT=$(git rev-parse --short HEAD)
+    - docker build -t $IMAGE_NAME:$COMMIT .
+    - docker tag $IMAGE_NAME:$COMMIT $IMAGE_NAME:latest
+    - docker push $IMAGE_NAME:$COMMIT
+    - docker push $IMAGE_NAME:latest
+
+deploy:
+  stage: deploy
+  image: docker:24
+  rules:
+  - if: '$CI_COMMIT_REF_NAME == "main"'
+  script:
+    - echo "$PASSWORD" | docker login dockerhub.rds03.utz.local -u "$USERNAME" --password-stdin
+    - docker pull $IMAGE_NAME:latest
+    - docker stop myapp || true
+    - docker rm myapp || true
+    - |
+      docker run -d \
+        --name myapp \
+        -p 8501:8501 \
+        --restart unless-stopped \
+        --security-opt apparmor=unconfined \
+        $IMAGE_NAME:latest
+    - docker ps
