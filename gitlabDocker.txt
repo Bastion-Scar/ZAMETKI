@@ -1,11 +1,26 @@
 variables PASSWORD и USERNAME указываются в гитлабе во вкладке CI/CD --> Variables
+TOKEN тоже. он должен проброситься в контейнер через -e TOKEN="$TOKEN" \
 
 stages:
+  - security
   - build
   - deploy
 
 variables:
   IMAGE_NAME: dockerhub.rds03.utz.local/test/myapp
+
+
+secret_scan:
+  stage: security
+  image:
+    name: zricethezav/gitleaks:latest
+    entrypoint: [""]
+  script:
+    - gitleaks detect --source . --report-format json --report-path gitleaks.json --exit-code 1
+  artifacts:
+    when: always
+    paths: 
+      - gitleaks.json
 
 build:
   stage: build
@@ -35,5 +50,6 @@ deploy:
         -p 8501:8501 \
         --restart unless-stopped \
         --security-opt apparmor=unconfined \
+        -e TOKEN="$TOKEN" \
         $IMAGE_NAME:latest
     - docker ps
