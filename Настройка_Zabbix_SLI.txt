@@ -1,0 +1,20 @@
+Перед всем этим должен быть установлен, например, Zabbix_Chromium
+
+Создать Web scenario. В Data Collection - Hosts - Web, Указать Name.
+Перейти в Steps, указать Name и ссылку на сайт.
+Перейти в Tags, там Name scope, Value - любой тэг, например master_chromium.
+
+Создать Trigger. В Data Collection - Hosts - Triggers, Указать Name. и Expression 
+(например last(/сайт/web.test.fail[имя веб сценария])<>0)
+(полный пример last(/master.utz.ru/web.test.fail[Checking master.utz Chromium])<>0)
+Перейти в Tags, там Name scope, Value - любой тэг, например master_chromium.
+
+Создать сервис. В Services - Services. Создать сервис, указать Name и тэг триггера, который был указан ранее. (например scope: master_chromium)
+Status calculation rule устанавливаем Set Status to OK.
+Переходим в Tags, там Name Service, Value - любой тэг, например Master service.
+
+Создать SLA. Services - SLA. Указать Name, SLO 99.9, Schedule 24x7, Service Tags указываем тот тэг, которым назвали Service. Например Service: Master service.
+
+Проверяем SLA Report, Проверяем Services (должно быть ОК).
+
+Отображаем в графане. Источник данных Zabbix, Query type Services, Service (сервис, созданный в заббиксе), SLA (тот, что создан в заббиксе), Property по нужде, в зависимости от того, что будет отображать график.
